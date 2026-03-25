@@ -1,0 +1,8 @@
+{
+  "name": "passport-claw",
+  "version": "0.1.0",
+  "openclaw": {
+    "entry": "./dist/index.js",
+    "capabilities": ["cli:commands"]
+  }
+}
