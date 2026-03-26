@@ -3,7 +3,9 @@
  * Implements `register()` so OpenClaw exposes `/passport` and exports helpers for CLI/tests.
  */
 
+import type { Command } from "commander";
 import { handlePassportCommand } from "./passportCommand.js";
+import { registerPassportCli } from "./passportCli.js";
 
 export { IssuerClient, getIssuerAdminToken, getIssuerBaseUrl, type SubjectJwk } from "./issuerClient.js";
 export { parseChallengeJson, type PassportChallenge } from "./challenge.js";
@@ -50,10 +52,14 @@ export function statusCLI(opts?: { dataDir?: string }): { enrolled: boolean; pas
 }
 
 /**
- * OpenClaw plugin registration — registers `/passport` (info, revoke, help).
- * See `openclaw.plugin.json` → `cli:commands`.
+ * OpenClaw plugin registration — `openclaw passport` CLI + chat `/passport`.
+ * See `openclaw.plugin.json` → `cli:commands` (slash) and `registerCli` (terminal).
  */
 export function register(api: {
+  registerCli: (
+    registrar: (ctx: { program: Command }) => void,
+    opts: { commands: string[] }
+  ) => void;
   registerCommand: (def: {
     name: string;
     description: string;
@@ -66,6 +72,8 @@ export function register(api: {
     }) => Promise<{ text?: string; isError?: boolean }> | { text?: string; isError?: boolean };
   }) => void;
 }): void {
+  api.registerCli(({ program }) => registerPassportCli(program), { commands: ["passport"] });
+
   api.registerCommand({
     name: "passport",
     description: "Passport Claw — `/passport` (info) · `/passport revoke` (burn passport for testing)",

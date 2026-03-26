@@ -7,9 +7,9 @@ description: After Passport Claw is installed — guide the human operator in ch
 
 Use this skill once the **Passport Claw** OpenClaw plugin is installed and enabled. The human is the **operator** who should see passport status and (in local dev) revoke for testing. Your job is to **explain clearly** and **avoid** walking them through low-level issuer REST unless they are debugging contracts.
 
-## Setup (so `/passport` exists)
+## Setup (so `/passport` and `openclaw passport` exist)
 
-Slash commands are **not** available until the **gateway** loads this plugin. You cannot “enable” the plugin from chat alone.
+Slash commands and the **`openclaw passport`** CLI are **not** available until the **gateway** loads this plugin. You cannot “enable” the plugin from chat alone.
 
 If the human asks you to install it and your session **can run shell** in the cloned repo: run **`npm run install:openclaw`** (or `bash scripts/install-openclaw-plugin.sh`) from the plugin root, then tell them to **restart the OpenClaw gateway** (or the process that runs it). Without a terminal tool, give them that one command and the restart note.
 

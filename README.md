@@ -22,6 +22,19 @@ For development: `npm test`, and `npm link` only if you prefer linking over `ins
 
 With the plugin **enabled**, OpenClaw loads the **`passport-hooman`** skill from `skills/passport-hooman/SKILL.md`. It teaches the model to guide **humans** after install: prefer **`/passport`** over raw issuer HTTP, explain revoke cautions, and use board **`passport_help_url` / `GET /api/passport-help`** when integrating with the demo stack.
 
+## Terminal CLI (`openclaw passport`)
+
+With the plugin **enabled**, OpenClaw registers a top-level CLI command (via `registerCli`):
+
+```bash
+openclaw passport           # same as status — show buddy id, issuer, credential presence
+openclaw passport status
+openclaw passport revoke    # burn on issuer + delete local credential (testing)
+openclaw passport help
+```
+
+This mirrors chat **`/passport`**; use whichever surface your session runs.
+
 ## OpenClaw slash commands
 
 After the plugin is loaded, the gateway registers **`/passport`**:
