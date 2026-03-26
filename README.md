@@ -73,11 +73,31 @@ Requires a **`register()`** export (implemented in `src/index.ts`). Rebuild (`np
 
 ## Env
 
-- `ISSUER_BASE_URL` — overrides default `http://127.0.0.1:19081`
-- `DEFAULT_ISSUER_BASE_URL` — fallback if unset
+- `ISSUER_BASE_URL` — issuer API base (defaults to **local** `http://127.0.0.1:19081` if unset — see below for **staging**)
+- `DEFAULT_ISSUER_BASE_URL` — fallback if `ISSUER_BASE_URL` unset
 - `PASSPORT_PLUGIN_DATA_DIR` — credential directory override (optional)
 - Default store: **`$OPENCLAW_STATE_DIR/passport-claw`** (usually **`~/.openclaw/passport-claw`**) — **not** `cwd`, so the gateway (often `cwd` `/`) and `openclaw passport` see the same files as chat **`/passport`**
-- `ISSUER_ADMIN_TOKEN` or `PASSPORT_ISSUER_ADMIN_TOKEN` — value for `X-Passport-Issuer-Admin` on **revoke** (default `dev_admin_token_local` to match local issuer)
+- `ISSUER_ADMIN_TOKEN` or `PASSPORT_ISSUER_ADMIN_TOKEN` — value for `X-Passport-Issuer-Admin` on **revoke** (default `dev_admin_token_local` to match local issuer; staging uses the token you set on Railway)
+
+### Public staging (Railway)
+
+To enroll and use **`/passport`** against the **hosted** demo stack, point the gateway / shell at the staging issuer (HTTPS):
+
+```bash
+export ISSUER_BASE_URL=https://issuer-staging.up.railway.app
+```
+
+Then restart OpenClaw and run **`/passport enroll`** (or `openclaw passport enroll`). Related URLs for docs and tooling:
+
+| Role | URL |
+|------|-----|
+| Issuer | `https://issuer-staging.up.railway.app` |
+| Verifier | `https://verifier-staging-e555.up.railway.app` |
+| Demo board (API + UI) | `https://demo-forum-staging.up.railway.app` |
+| Setup page | `https://demo-forum-staging.up.railway.app/passport-local.html` |
+| `GET` passport help JSON | `https://demo-forum-staging.up.railway.app/api/passport-help` |
+
+The package exports **`STAGING_PASSPORT_STACK`**, **`stagingSetupGuideUrl()`**, and **`stagingPassportHelpUrl()`** (`src/localDefaults.ts`) for the same values in code.
 
 ## Local stack (hardcoded for dev)
 

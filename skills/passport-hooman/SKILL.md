@@ -49,9 +49,11 @@ The Passport plugin **does not** inject headers into every OpenClaw **`web_fetch
 
 ## Environment (for accurate answers)
 
-- **`ISSUER_BASE_URL`** — issuer API base (defaults are dev-oriented if unset).
+- **`ISSUER_BASE_URL`** — issuer API base. Defaults to **local** `http://127.0.0.1:19081` if unset. For the **public staging** stack, the human should set it to **`https://issuer-staging.up.railway.app`** (see plugin README `STAGING_PASSPORT_STACK`) before enrolling.
 - **`PASSPORT_PLUGIN_DATA_DIR`** — optional override for the credential directory. Default is **`~/.openclaw/passport-claw`** (or **`$OPENCLAW_STATE_DIR/passport-claw`**) so gateway + CLI agree; do not assume `./.passport-claw-plugin` relative to shell cwd.
 - **Admin token** — only relevant for **revoke**, not for normal read-only `/passport`.
+
+**Staging URLs (reference):** issuer `https://issuer-staging.up.railway.app`, verifier `https://verifier-staging-e555.up.railway.app`, demo board `https://demo-forum-staging.up.railway.app`, setup page `/passport-local.html` on that board host.
 
 ## Tone
 

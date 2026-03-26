@@ -11,8 +11,11 @@ export { IssuerClient, getIssuerAdminToken, getIssuerBaseUrl, type SubjectJwk } 
 export { parseChallengeJson, type PassportChallenge } from "./challenge.js";
 export {
   LOCAL_PASSPORT_STACK,
+  STAGING_PASSPORT_STACK,
   localPassportHelpUrl,
   localSetupGuideUrl,
+  stagingPassportHelpUrl,
+  stagingSetupGuideUrl,
 } from "./localDefaults.js";
 export {
   loadCredential,

@@ -61,6 +61,7 @@ export class IssuerClient {
 
 export function getIssuerBaseUrl(): string {
   const env = process.env.ISSUER_BASE_URL?.trim();
+  /** Local Crux default; for public staging set ISSUER_BASE_URL (see STAGING_PASSPORT_STACK in localDefaults). */
   const def = process.env.DEFAULT_ISSUER_BASE_URL?.trim() || "http://127.0.0.1:19081";
   return (env || def).replace(/\/$/, "");
 }
