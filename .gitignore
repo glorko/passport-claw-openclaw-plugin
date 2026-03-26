@@ -1,6 +1,34 @@
+# Dependencies
 node_modules/
+
+# Build
 dist/
+*.tsbuildinfo
+
+# Env & secrets
 .env
 .env.*
-*.pem
+!.env.example
+
+# Local OpenClaw / plugin credential (never commit)
 passport-credential.json
+
+# Keys
+*.pem
+*.key
+
+# OS & editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+npm-debug.log*

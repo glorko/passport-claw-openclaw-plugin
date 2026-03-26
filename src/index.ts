@@ -81,11 +81,13 @@ export function register(api: {
 
   api.registerCommand({
     name: "passport",
-    description: "Passport Claw — `/passport` · `/passport enroll` · `/passport revoke`",
+    description:
+      "Passport Claw — `/passport` · `/passport enroll` · `/passport revoke` · `/passport reissue`",
     acceptsArgs: true,
     handler: async (ctx) =>
       handlePassportCommand({
         args: ctx.args,
+        channel: ctx.channel,
         config: ctx.config,
       }),
   });

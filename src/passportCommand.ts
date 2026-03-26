@@ -8,15 +8,34 @@ import { clearCredential, defaultDataDir, loadCredential } from "./storage.js";
 /** Minimal shape OpenClaw passes to plugin command handlers. */
 export type PassportCommandContext = {
   args?: string;
+  /** Chat surface (e.g. `tui`, `telegram`). Omitted in tests / CLI wrappers. */
+  channel?: string;
   /** Full OpenClaw config from slash handler; CLI passes snapshot from `register()`. */
   config?: unknown;
 };
 
 export function helpText(): string {
   return (
-    "Passport Claw: `/passport` or `/passport info` — show your buddy + passport id. " +
+    "Passport Claw: `/passport` or `/passport info` — show your buddy + passport id (plain ASCII in TUI; use `/passport plain` elsewhere for the same). " +
     "`/passport enroll` — generate a key, register with the issuer, save credential (needs issuer reachable). " +
-    "`/passport revoke` — burn this install's passport on the issuer (needs ISSUER_ADMIN_TOKEN) and delete the local credential file."
+    "`/passport revoke` — burn this install's passport on the issuer (needs ISSUER_ADMIN_TOKEN) and delete the local credential file. " +
+    "`/passport reissue` — how to get a new passport (revoke, then enroll)."
+  );
+}
+
+/** TUI renders fenced markdown poorly; plain monospace matches `openclaw passport` output. */
+function usePlainAsciiCard(channel: string | undefined, firstToken: string): boolean {
+  if (firstToken === "plain" || firstToken === "text" || firstToken === "ascii") return true;
+  const c = channel?.trim().toLowerCase() ?? "";
+  return c === "tui" || c === "openclaw-tui";
+}
+
+function reissueHelpText(): string {
+  return (
+    "New passport (re-issue): burn the old one, then enroll again.\n" +
+    "1. `/passport revoke` — revoke on issuer + delete local credential (needs ISSUER_ADMIN_TOKEN).\n" +
+    "2. `/passport enroll` — new key + new passport id.\n" +
+    "CLI: `openclaw passport revoke` then `openclaw passport enroll`."
   );
 }
 
@@ -25,6 +44,7 @@ export async function handlePassportCommand(
 ): Promise<{ text?: string; isError?: boolean }> {
   const raw = (ctx.args ?? "").trim().toLowerCase();
   const dataDir = defaultDataDir();
+  const firstToken = raw.split(/\s+/).filter(Boolean)[0] ?? "";
 
   if (raw === "revoke" || raw === "burn") {
     return runRevoke(dataDir, ctx.config);
@@ -32,13 +52,22 @@ export async function handlePassportCommand(
   if (raw === "enroll" || raw === "register") {
     return runEnroll(dataDir, ctx.config);
   }
+  if (firstToken === "reissue" || firstToken === "renew") {
+    return { text: reissueHelpText() };
+  }
   if (raw === "help" || raw === "?") {
     return { text: helpText() };
   }
   if (raw && raw !== "info" && raw !== "status") {
-    return { text: `Unknown subcommand. ${helpText()}`, isError: true };
+    const plainOnly =
+      firstToken === "plain" || firstToken === "text" || firstToken === "ascii";
+    if (!plainOnly) {
+      return { text: `Unknown subcommand. ${helpText()}`, isError: true };
+    }
   }
-  return runInfo(dataDir, ctx.config);
+  return runInfo(dataDir, ctx.config, {
+    plain: usePlainAsciiCard(ctx.channel, firstToken),
+  });
 }
 
 async function runEnroll(
@@ -81,7 +110,11 @@ function formatWhoLine(config: unknown | undefined, passportId: string, tail: st
   return `🦞 Your passport buddy: **${buddy}** · tag \`#${tail}\``;
 }
 
-function runInfo(dataDir: string, config?: unknown): { text: string } {
+function runInfo(
+  dataDir: string,
+  config?: unknown,
+  opts?: { plain?: boolean }
+): { text: string } {
   const c = loadCredential(dataDir);
   if (!c) {
     return {
@@ -97,11 +130,11 @@ function runInfo(dataDir: string, config?: unknown): { text: string } {
     issuerUrl: getIssuerBaseUrl(),
     tailTag: tail,
   });
+  const plain = opts?.plain === true;
+  const cardBlock = plain ? `${card}\n\n` : "```\n" + card + "\n```\n\n";
   return {
     text:
-      "```\n" +
-      card +
-      "\n```\n\n" +
+      cardBlock +
       `${formatWhoLine(config, c.passport_id, tail)}\n` +
       `Passport ID: \`${c.passport_id}\`\n` +
       `Issuer: ${getIssuerBaseUrl()}\n` +

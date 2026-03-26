@@ -30,6 +30,55 @@ describe("handlePassportCommand", () => {
     expect(out.isError).toBe(true);
   });
 
+  it("reissue explains revoke then enroll", async () => {
+    const out = await handlePassportCommand({ args: "reissue" });
+    expect(out.text).toMatch(/revoke/);
+    expect(out.text).toMatch(/enroll/);
+  });
+
+  it("default info uses fenced card when channel omitted", async () => {
+    fs.writeFileSync(
+      path.join(tmp, "passport-credential.json"),
+      JSON.stringify({
+        passport_id: "33333333-3333-4333-8333-333333333333",
+        credential: "x",
+        subject_jwk: {},
+      }),
+      "utf8"
+    );
+    const out = await handlePassportCommand({});
+    expect(out.text).toMatch(/^```\n/);
+  });
+
+  it("tui channel uses plain card (no markdown fence)", async () => {
+    fs.writeFileSync(
+      path.join(tmp, "passport-credential.json"),
+      JSON.stringify({
+        passport_id: "44444444-4444-4444-8444-444444444444",
+        credential: "x",
+        subject_jwk: {},
+      }),
+      "utf8"
+    );
+    const out = await handlePassportCommand({ channel: "tui" });
+    expect(out.text).not.toMatch(/^```/);
+    expect(out.text).toMatch(/Passport ID/);
+  });
+
+  it("plain subcommand forces plain card", async () => {
+    fs.writeFileSync(
+      path.join(tmp, "passport-credential.json"),
+      JSON.stringify({
+        passport_id: "55555555-5555-4555-8555-555555555555",
+        credential: "x",
+        subject_jwk: {},
+      }),
+      "utf8"
+    );
+    const out = await handlePassportCommand({ args: "plain", channel: "telegram" });
+    expect(out.text).not.toMatch(/^```/);
+  });
+
   it("enroll saves credential when issuer ok", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(
