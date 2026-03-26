@@ -27,6 +27,16 @@ export function saveCredential(dataDir: string, cred: StoredCredential): void {
   fs.writeFileSync(credentialPath(dataDir), JSON.stringify(cred, null, 2), { mode: 0o600 });
 }
 
+/** Remove stored credential file (e.g. after revoke). Ignores missing file. */
+export function clearCredential(dataDir: string): void {
+  const p = credentialPath(dataDir);
+  try {
+    fs.unlinkSync(p);
+  } catch {
+    // ignore
+  }
+}
+
 export function defaultDataDir(): string {
   return process.env.PASSPORT_PLUGIN_DATA_DIR?.trim() || path.join(process.cwd(), ".passport-claw-plugin");
 }

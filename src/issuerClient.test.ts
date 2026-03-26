@@ -30,4 +30,19 @@ describe("IssuerClient", () => {
     const body = JSON.parse(String(init.body));
     expect(body.passport_id).toBe("abc");
   });
+
+  it("revokePassport sends admin header", async () => {
+    const fetchMock = vi.fn(async (url: string | URL) => {
+      expect(String(url)).toContain("/v1/passports/");
+      expect(String(url)).toContain("/revoke");
+      return new Response(null, { status: 204 });
+    });
+    const c = new IssuerClient("http://iss", fetchMock as unknown as typeof fetch);
+    await c.revokePassport("550e8400-e29b-41d4-a716-446655440000", "secret-admin");
+    const call = fetchMock.mock.calls[0] as unknown as [string, RequestInit?];
+    const init = call[1] ?? {};
+    expect(init.method).toBe("POST");
+    const h = new Headers(init.headers ?? {});
+    expect(h.get("X-Passport-Issuer-Admin")).toBe("secret-admin");
+  });
 });

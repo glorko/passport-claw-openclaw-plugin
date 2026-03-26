@@ -29,6 +29,19 @@ export class IssuerClient {
     return res.json() as Promise<{ passport_id: string; credential: string }>;
   }
 
+  /** POST /v1/passports/{id}/revoke — requires issuer admin token (testing / ops). */
+  async revokePassport(passportId: string, adminToken: string): Promise<void> {
+    const url = `${this.baseUrl}/v1/passports/${encodeURIComponent(passportId)}/revoke`;
+    const res = await this.fetchImpl(url, {
+      method: "POST",
+      headers: { "X-Passport-Issuer-Admin": adminToken },
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(`revoke ${res.status}: ${t}`);
+    }
+  }
+
   async mintPresentation(
     body: { credential: string } | { passport_id: string; audience?: string }
   ): Promise<{ presentation: string }> {
@@ -48,6 +61,15 @@ export class IssuerClient {
 
 export function getIssuerBaseUrl(): string {
   const env = process.env.ISSUER_BASE_URL?.trim();
-  const def = process.env.DEFAULT_ISSUER_BASE_URL?.trim() || "http://127.0.0.1:8081";
+  const def = process.env.DEFAULT_ISSUER_BASE_URL?.trim() || "http://127.0.0.1:19081";
   return (env || def).replace(/\/$/, "");
+}
+
+/** Header value for `X-Passport-Issuer-Admin` (revoke). Defaults to local dev token. */
+export function getIssuerAdminToken(): string {
+  return (
+    process.env.ISSUER_ADMIN_TOKEN?.trim() ||
+    process.env.PASSPORT_ISSUER_ADMIN_TOKEN?.trim() ||
+    "dev_admin_token_local"
+  );
 }

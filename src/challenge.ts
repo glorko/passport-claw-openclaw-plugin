@@ -4,6 +4,9 @@ export type PassportChallenge = {
   status?: number;
   passport_docs_url?: string;
   verifier_url?: string;
+  issuer_url?: string;
+  board_api_url?: string;
+  passport_help_url?: string;
   title?: string;
 };
 
