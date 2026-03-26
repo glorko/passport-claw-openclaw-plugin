@@ -4,7 +4,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-echo "==> passport-claw-openclaw-plugin: npm ci"
+echo "==> passport-claw-plugin: npm ci"
 npm ci
 echo "==> npm run build"
 npm run build

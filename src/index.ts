@@ -24,6 +24,8 @@ export {
 } from "./storage.js";
 export { petNameFromPassportId, shortPassportTail } from "./petName.js";
 export { handlePassportCommand, helpText, type PassportCommandContext } from "./passportCommand.js";
+export { enrollNewPassport } from "./enrollRun.js";
+export { buildPassportAsciiCard } from "./passportAsciiCard.js";
 
 import { IssuerClient, getIssuerBaseUrl, type SubjectJwk } from "./issuerClient.js";
 import { loadCredential, saveCredential, defaultDataDir } from "./storage.js";
@@ -56,6 +58,8 @@ export function statusCLI(opts?: { dataDir?: string }): { enrolled: boolean; pas
  * See `openclaw.plugin.json` → `cli:commands` (slash) and `registerCli` (terminal).
  */
 export function register(api: {
+  /** Current OpenClaw config (same object plugin SDK injects). */
+  config: unknown;
   registerCli: (
     registrar: (ctx: { program: Command }) => void,
     opts: { commands: string[] }
@@ -72,12 +76,17 @@ export function register(api: {
     }) => Promise<{ text?: string; isError?: boolean }> | { text?: string; isError?: boolean };
   }) => void;
 }): void {
-  api.registerCli(({ program }) => registerPassportCli(program), { commands: ["passport"] });
+  const hostConfig = api.config;
+  api.registerCli(({ program }) => registerPassportCli(program, hostConfig), { commands: ["passport"] });
 
   api.registerCommand({
     name: "passport",
-    description: "Passport Claw — `/passport` (info) · `/passport revoke` (burn passport for testing)",
+    description: "Passport Claw — `/passport` · `/passport enroll` · `/passport revoke`",
     acceptsArgs: true,
-    handler: async (ctx) => handlePassportCommand(ctx),
+    handler: async (ctx) =>
+      handlePassportCommand({
+        args: ctx.args,
+        config: ctx.config,
+      }),
   });
 }

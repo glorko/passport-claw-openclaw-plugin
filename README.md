@@ -8,7 +8,7 @@ Crux does **not** load the plugin. **`/passport` is registered by the OpenClaw g
 
 ### Plugin id (enable / uninstall / list)
 
-OpenClaw uses the **`id`** from `openclaw.plugin.json` — **`passport-claw`**. That is **not** the same as the npm package name (`passport-claw-openclaw-plugin`). Use **`passport-claw`** for:
+OpenClaw uses the **`id`** from `openclaw.plugin.json` — **`passport-claw`**. The npm **`package.json`** name is **`passport-claw-plugin`** (OpenClaw treats `<id>-plugin` as a valid hint). Use **`passport-claw`** for:
 
 - `openclaw plugins enable passport-claw`
 - `openclaw plugins disable passport-claw`
@@ -49,9 +49,10 @@ With the plugin **enabled**, OpenClaw loads the **`passport-hooman`** skill from
 With the plugin **enabled**, OpenClaw registers a top-level CLI command (via `registerCli`):
 
 ```bash
-openclaw passport           # same as status — show buddy id, issuer, credential presence
+openclaw passport              # same as status — show buddy id, issuer, credential presence
 openclaw passport status
-openclaw passport revoke    # burn on issuer + delete local credential (testing)
+openclaw passport enroll       # generate key, POST /v1/passports, save credential locally
+openclaw passport revoke       # burn on issuer + delete local credential (testing)
 openclaw passport help
 ```
 
@@ -63,7 +64,8 @@ After the plugin is loaded, the gateway registers **`/passport`**:
 
 | Input | Behavior |
 |--------|----------|
-| `/passport` or `/passport info` | Prints a cute **buddy name** (pet id) derived from your passport UUID, full passport id, issuer URL, and whether a local credential file exists. |
+| `/passport` or `/passport info` | Prints a monospace **ASCII passport** (holder, type **OpenClaw Agent**, mood doodle, stamps, fake MRZ) in a code block, then **buddy** line, passport id, issuer, credential presence. Buddy = OpenClaw agent name when set, else deterministic pet name from UUID. |
+| `/passport enroll` (alias `register`) | Generates an **Ed25519** key, **`POST /v1/passports`** to the issuer, saves **credential + private JWK** under the configured data dir. Fails if a credential file already exists (revoke first). |
 | `/passport revoke` (alias `burn`) | Calls issuer **`POST /v1/passports/{id}/revoke`** with the admin header, then **deletes** the local credential file. For **local testing**; anyone with the admin token can revoke. |
 | `/passport help` | Short usage text. |
 
@@ -73,7 +75,8 @@ Requires a **`register()`** export (implemented in `src/index.ts`). Rebuild (`np
 
 - `ISSUER_BASE_URL` — overrides default `http://127.0.0.1:19081`
 - `DEFAULT_ISSUER_BASE_URL` — fallback if unset
-- `PASSPORT_PLUGIN_DATA_DIR` — credential file directory (default `./.passport-claw-plugin`)
+- `PASSPORT_PLUGIN_DATA_DIR` — credential directory override (optional)
+- Default store: **`$OPENCLAW_STATE_DIR/passport-claw`** (usually **`~/.openclaw/passport-claw`**) — **not** `cwd`, so the gateway (often `cwd` `/`) and `openclaw passport` see the same files as chat **`/passport`**
 - `ISSUER_ADMIN_TOKEN` or `PASSPORT_ISSUER_ADMIN_TOKEN` — value for `X-Passport-Issuer-Admin` on **revoke** (default `dev_admin_token_local` to match local issuer)
 
 ## Local stack (hardcoded for dev)

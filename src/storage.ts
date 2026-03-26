@@ -1,4 +1,5 @@
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 
 export type StoredCredential = {
@@ -37,6 +38,28 @@ export function clearCredential(dataDir: string): void {
   }
 }
 
+/** Expand leading `~` the same way shells do (OpenClaw env paths often use this). */
+export function expandUserPath(input: string): string {
+  const t = input.trim();
+  if (!t) return t;
+  if (t === "~") return os.homedir();
+  if (t.startsWith("~/")) return path.join(os.homedir(), t.slice(2));
+  return path.resolve(t);
+}
+
+/** OpenClaw config/state root: `OPENCLAW_STATE_DIR` or `~/.openclaw`. */
+export function openClawStateDir(): string {
+  const raw = process.env.OPENCLAW_STATE_DIR?.trim();
+  if (raw) return expandUserPath(raw);
+  return path.join(os.homedir(), ".openclaw");
+}
+
+/**
+ * Credential directory: `PASSPORT_PLUGIN_DATA_DIR` if set, else
+ * `<openClawStateDir>/passport-claw` (not `process.cwd()` — the gateway often has cwd `/`).
+ */
 export function defaultDataDir(): string {
-  return process.env.PASSPORT_PLUGIN_DATA_DIR?.trim() || path.join(process.cwd(), ".passport-claw-plugin");
+  const raw = process.env.PASSPORT_PLUGIN_DATA_DIR?.trim();
+  if (raw) return expandUserPath(raw);
+  return path.join(openClawStateDir(), "passport-claw");
 }
