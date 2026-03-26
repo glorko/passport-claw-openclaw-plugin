@@ -13,3 +13,4 @@ openclaw plugins install -l "$ROOT"
 echo "==> openclaw plugins enable passport-claw"
 openclaw plugins enable passport-claw
 echo "==> Done. Restart the OpenClaw gateway (or process running it) so slash commands load."
+echo "    Plugin id: passport-claw (from openclaw.plugin.json). Remove later: openclaw plugins uninstall passport-claw"

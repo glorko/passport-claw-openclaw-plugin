@@ -11,7 +11,7 @@ Use this skill once the **Passport Claw** OpenClaw plugin is installed and enabl
 
 Slash commands and the **`openclaw passport`** CLI are **not** available until the **gateway** loads this plugin. You cannot “enable” the plugin from chat alone.
 
-If the human asks you to install it and your session **can run shell** in the cloned repo: run **`npm run install:openclaw`** (or `bash scripts/install-openclaw-plugin.sh`) from the plugin root, then tell them to **restart the OpenClaw gateway** (or the process that runs it). Without a terminal tool, give them that one command and the restart note.
+If the human asks you to install it and your session **can run shell** in the cloned repo: run **`npm run install:openclaw`** (or `bash scripts/install-openclaw-plugin.sh`) from the plugin root, then tell them to **restart the OpenClaw gateway** (or the process that runs it). Without a terminal tool, give them that one command and the restart note. **Do not** rely on `npm link` alone if they need **`openclaw plugins uninstall`** to work — they need **`openclaw plugins install`** (the script uses `install -l`). The OpenClaw plugin **id** for enable/uninstall is **`passport-claw`** (see `openclaw.plugin.json`), not the npm package name.
 
 ## What to tell the human
 

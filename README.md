@@ -6,6 +6,20 @@ TypeScript helpers for Passport Claw: issuer HTTP client, challenge JSON parse, 
 
 Crux does **not** load the plugin. **`/passport` is registered by the OpenClaw gateway** when it loads this plugin — the LLM cannot inject a Node plugin into the host by chatting alone. After install, **restart the gateway** so commands appear.
 
+### Plugin id (enable / uninstall / list)
+
+OpenClaw uses the **`id`** from `openclaw.plugin.json` — **`passport-claw`**. That is **not** the same as the npm package name (`passport-claw-openclaw-plugin`). Use **`passport-claw`** for:
+
+- `openclaw plugins enable passport-claw`
+- `openclaw plugins disable passport-claw`
+- `openclaw plugins uninstall passport-claw`
+
+`openclaw plugins list` shows this under the **ID** column.
+
+### Why uninstall said “Plugin not found”
+
+OpenClaw only tracks plugins that were installed with **`openclaw plugins install`** (or equivalent). If you only **`npm link`**’d the package, hand-edited config, or never ran install on this machine, there is **no install record**, so **`uninstall <id>`** cannot find it. Fix: run **`npm run install:openclaw`** (or `openclaw plugins install -l "$(pwd)"` after build) once, then uninstall works.
+
 **One command** (from this repo root, `openclaw` on `PATH`):
 
 ```bash
@@ -16,7 +30,15 @@ Equivalent manual steps: `npm ci` → `npm run build` → `openclaw plugins inst
 
 If your OpenClaw agent session **can run shell** (`exec` / terminal tool), you can ask it to run `npm run install:openclaw` here after `git clone`. It still cannot skip **restarting the gateway** — that’s the process that loads plugins.
 
-For development: `npm test`, and `npm link` only if you prefer linking over `install -l`.
+For development: `npm test`, and `npm link` only if you prefer linking over `install -l` — but for a **removable** install, prefer **`openclaw plugins install -l "$(pwd)"`** so OpenClaw records the plugin.
+
+### Remove
+
+```bash
+openclaw plugins uninstall passport-claw
+```
+
+Use `--force` to skip the confirmation prompt. If you used **`--link`** (`-l`), OpenClaw keeps a link to your tree; uninstall clears the OpenClaw install entry (your repo files stay on disk).
 
 ## Agent skill (operator guidance)
 
