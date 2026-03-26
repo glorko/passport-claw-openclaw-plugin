@@ -4,16 +4,23 @@ TypeScript helpers for Passport Claw: issuer HTTP client, challenge JSON parse, 
 
 ## Install from this repo (not Crux)
 
-Crux does **not** load the plugin. From this directory:
+Crux does **not** load the plugin. **`/passport` is registered by the OpenClaw gateway** when it loads this plugin — the LLM cannot inject a Node plugin into the host by chatting alone. After install, **restart the gateway** so commands appear.
+
+**One command** (from this repo root, `openclaw` on `PATH`):
 
 ```bash
-npm ci
-npm run build
-npm test
-npm link
+npm run install:openclaw
 ```
 
-Then register the linked package in OpenClaw per **your** host version (`openclaw plugins`, path, or workspace). Manifest: `openclaw.plugin.json` → `./dist/index.js`.
+Equivalent manual steps: `npm ci` → `npm run build` → `openclaw plugins install -l "$(pwd)"` → `openclaw plugins enable passport-claw`.
+
+If your OpenClaw agent session **can run shell** (`exec` / terminal tool), you can ask it to run `npm run install:openclaw` here after `git clone`. It still cannot skip **restarting the gateway** — that’s the process that loads plugins.
+
+For development: `npm test`, and `npm link` only if you prefer linking over `install -l`.
+
+## Agent skill (operator guidance)
+
+With the plugin **enabled**, OpenClaw loads the **`passport-hooman`** skill from `skills/passport-hooman/SKILL.md`. It teaches the model to guide **humans** after install: prefer **`/passport`** over raw issuer HTTP, explain revoke cautions, and use board **`passport_help_url` / `GET /api/passport-help`** when integrating with the demo stack.
 
 ## OpenClaw slash commands
 

@@ -5,10 +5,14 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "openclaw": {
+    "extensions": ["./dist/index.js"]
+  },
   "scripts": {
     "build": "tsc",
     "test": "node --experimental-vm-modules node_modules/vitest/vitest.mjs run",
-    "lint": "echo ok"
+    "lint": "echo ok",
+    "install:openclaw": "bash scripts/install-openclaw-plugin.sh"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

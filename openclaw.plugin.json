@@ -1,8 +1,11 @@
 {
-  "name": "passport-claw",
+  "id": "passport-claw",
+  "name": "Passport Claw",
+  "description": "Passport enrollment, slash commands, and operator guidance (passport-hooman skill) for Passport Claw sites.",
   "version": "0.1.0",
-  "openclaw": {
-    "entry": "./dist/index.js",
-    "capabilities": ["cli:commands"]
-  }
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false
+  },
+  "skills": ["skills/passport-hooman"]
 }
